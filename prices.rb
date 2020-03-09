@@ -1,6 +1,5 @@
 require 'roo'
 require 'forwardable'
-require 'pry' # debug
 
 # Has fields for a JIT produce item.
 JitProduceItem =
@@ -33,8 +32,6 @@ class ReportRow
   def_delegators :@cur, :vendor_num, :id, :price, :size
 
   def initialize(cur, prev)
-    binding.pry if prev && (cur.id != prev.id)
-
     @prev = prev
     @cur = cur
   end
@@ -84,15 +81,15 @@ end
 # Everything to run the script. Outputs a CSV with differences.
 class Script
   DATA_DIR = 'data'
-  OUTPUT_DIR = 'output'
+  OUTPUT_DIR = 'c:\users\jcipriano\desktop' # 'output'
   OUTPUT_HEADERS = %w[ID Vendor_Num Description Size Price Last_Price Difference]
 
   attr_reader :code_map
 
   def run
     @code_map = make_code_map('codes.csv')
-    prev_items = xlsx_to_items('xdock-list-3.1-3.5.xlsx')
-    cur_items = xlsx_to_items('xdock-list-3.8-3.13.xlsx')
+    prev_items = xlsx_to_items(ARGV[0])
+    cur_items = xlsx_to_items(ARGV[1])
 
     prev_items_by_id = prev_items.each_with_object({}) do |item, hsh|
       hsh[item.id] = item
@@ -120,10 +117,8 @@ class Script
   private
 
   def xlsx_to_items(file_name)
-    path = File.join(DATA_DIR, file_name)
-    raise 'no file' unless File.file?(path)
-
-    book = RooWrapper.new(path).book
+    raise 'no file' unless File.file?(file_name)
+    book = RooWrapper.new(file_name).book
 
     book.parse.map do |row|
       row[1] = row[1].gsub(/\s+/, " ")
@@ -148,4 +143,5 @@ class Script
   end
 end
 
+# TODO: validate ARGV, pass in
 Script.new.run
