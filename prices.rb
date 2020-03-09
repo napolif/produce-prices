@@ -105,7 +105,7 @@ class Script
       -1 * (row.diff || 0).abs
     end
 
-    csv_path = File.join(OUTPUT_DIR, 'jit.csv')
+    csv_path = File.join(OUTPUT_DIR, 'jit-produce-prices.csv')
     CSV.open(csv_path, 'wb', write_headers: true, headers: OUTPUT_HEADERS) do |csv|
       report_rows.each do |row|
         next if row.diff&.zero?
