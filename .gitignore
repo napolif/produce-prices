@@ -1,3 +1,6 @@
 /data/*
+!/data/.keep
+/output/*
+!/output/.keep
 
 .DS_Store
