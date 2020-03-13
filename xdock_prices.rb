@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'roo'
 require 'forwardable'
 
@@ -41,12 +43,13 @@ class ReportRow
   end
 
   def diff
-    return nil unless last_price
+    return unless last_price
+
     price - last_price
   end
 
   def description
-    prefix = prev.nil? ? "*** NEW *** " : ""
+    prefix = prev.nil? ? '*** NEW *** ' : ''
     prefix + cur.description
   end
 
@@ -74,15 +77,15 @@ class ReportRow
   end
 
   def currency(val)
-    "%.2f" % val.to_f
+    '%.2f' % val.to_f
   end
 end
 
 # Everything to run the script. Outputs a CSV with differences.
 class Script
-  DATA_DIR = 'data'
+  DATA_DIR = 'data'.freeze
   OUTPUT_DIR = 'c:\users\jcipriano\desktop' # 'output'
-  OUTPUT_HEADERS = %w[ID Vendor_Num Description Size Price Last_Price Difference]
+  OUTPUT_HEADERS = %w[ID Vendor_Num Description Size Price Last_Price Difference].freeze
 
   attr_reader :code_map
 
@@ -118,6 +121,7 @@ class Script
 
   def xlsx_to_items(file_name)
     raise 'no file' unless File.file?(file_name)
+
     book = RooWrapper.new(file_name).book
 
     book.parse.map do |row|
@@ -138,8 +142,8 @@ class Script
   end
 
   def cleaned(str)
-    result = str&.strip&.sub!("'", "")
-    result == "" ? nil : result
+    result = str&.strip&.sub!("'", '')
+    result == '' ? nil : result
   end
 end
 
