@@ -83,8 +83,8 @@ end
 
 # Everything to run the script. Outputs a CSV with differences.
 class Script
-  DATA_DIR = 'data'.freeze
-  OUTPUT_DIR = 'c:\users\jcipriano\desktop' # 'output'
+  DATA_DIR = 'data'
+  OUTPUT_DIR = File.join(ENV['HOME'], 'Desktop').freeze
   OUTPUT_HEADERS = %w[ID Vendor_Num Description Size Price Last_Price Difference].freeze
 
   attr_reader :code_map
