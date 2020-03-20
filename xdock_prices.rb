@@ -54,10 +54,7 @@ class ReportRow
   end
 
   def to_h
-    cur.to_h.merge({
-      diff: diff,
-      description: description
-    })
+    cur.to_h.merge(diff: diff, description: description)
   end
 
   def values
@@ -89,7 +86,7 @@ class Script
 
   attr_reader :code_map
 
-  def run
+  def run # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
     @code_map = make_code_map('codes.csv')
     prev_items = xlsx_to_items(ARGV[0])
     cur_items = xlsx_to_items(ARGV[1])
@@ -101,10 +98,11 @@ class Script
     report_rows = cur_items.map do |cur|
       prev = prev_items_by_id[cur.id]
       ReportRow.new(cur, prev)
-    end.sort_by do |row|
-      row.id
-    end.sort_by do |row|
+    end
+    report_rows.sort_by!(&:id)
+    report_rows.sort_by! do |row|
       next -1e10 if row.diff.nil?
+
       -1 * (row.diff || 0).abs
     end
 
@@ -112,6 +110,7 @@ class Script
     CSV.open(csv_path, 'wb', write_headers: true, headers: OUTPUT_HEADERS) do |csv|
       report_rows.each do |row|
         next if row.diff&.zero?
+
         csv << row.values
       end
     end
@@ -119,13 +118,13 @@ class Script
 
   private
 
-  def xlsx_to_items(file_name)
+  def xlsx_to_items(file_name) # rubocop:disable Metrics/AbcSize
     raise 'no file' unless File.file?(file_name)
 
     book = RooWrapper.new(file_name).book
 
     book.parse.map do |row|
-      row[1] = row[1].gsub(/\s+/, " ")
+      row[1] = row[1].gsub(/\s+/, ' ')
       row[4] = code_map[row[4].to_s] || row[4].to_s
       JitProduceItem.new(*row)
     end
